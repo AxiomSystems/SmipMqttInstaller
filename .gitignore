@@ -1,0 +1,12 @@
+/opt/thinkiq/services/CerficateGenerator/*
+/opt/thinkiq/services/Configurator/*
+/opt/thinkiq/services/Monitor/*
+/opt/thinkiq/services/OpcUANorthService/*
+/opt/thinkiq/services/SouthBridgeService/Bouncy*
+/opt/thinkiq/services/SouthBridgeService/Newtonsoft*
+/opt/thinkiq/services/SouthBridgeService/Opc*
+/opt/thinkiq/services/SouthBridgeService/Serilog*
+/opt/thinkiq/services/SouthBridgeService/Microsoft*
+/opt/thinkiq/services/SouthBridgeService/System*
+/opt/thinkiq/services/SouthBridgeService/ThinkIQ*
+/opt/thinkiq/services/SouthBridgeService/tiq*

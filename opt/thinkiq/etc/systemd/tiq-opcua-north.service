@@ -1,0 +1,18 @@
+[Unit]
+Description=TIQ OPC UA North Service
+After=network.target
+
+[Service]
+Type=simple
+#User=root
+#Group=root
+WorkingDirectory=/opt/thinkiq/services/OpcUaNorthService
+ExecStart=/usr/bin/dotnet ThinkIQ.Opc.Ua.NorthService.dll
+Restart=on-failure
+RestartSec=30s
+# Give a reasonable amount of time for the server to start up/shut down
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target
+

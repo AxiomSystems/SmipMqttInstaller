@@ -1,0 +1,24 @@
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "LevelsAre": "Verbose Debug Information Warning Error Fatal",
+      "Default": "Information"
+    },
+    "WriteTo": [
+      {
+        "Name":  "Console"
+      },      
+      {
+        "Name": "File",
+        "Args": {
+          "path": "%LOGFILEPATH%",
+          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}",
+          "fileSizeLimitBytes": 16777216,
+          "rollOnFileSizeLimit": true,
+          "rollingInterval": "Day",
+          "retainedFileCountLimit": "100"
+        }
+      }
+    ]
+  }
+}

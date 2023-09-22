@@ -1,0 +1,9 @@
+﻿{
+  "Parent": [
+    "thinkiq",
+    "qa_gateway"
+  ],
+  "Name": "opc_ua_connector",
+  "Attributes": {
+  }
+}

@@ -1,0 +1,11 @@
+Package: smip-mqtt-gateway
+Version: 1.41611.1
+Architecture: all
+Essential: no
+Section: web
+Priority: optional
+#Depends: dotnet (>=3.1)
+Maintainer: AxiomSystems
+Description: MQTT Connector with SMIP Gateway Services
+Installed-Size: 113254
+

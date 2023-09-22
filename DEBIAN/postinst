@@ -1,0 +1,106 @@
+#!/bin/sh
+
+failed() {
+ echo "Installation failed!"
+ exit 1
+}
+
+warning() {
+ echo "Installation warning: $arg1"
+}
+
+lastUsers=$(last -1 -n 1 --nohostname)
+set -- $lastUsers
+currUser=$1
+currHome="/home/$currUser"
+
+echo "Configuring Pre-requisites"
+#TODO: This doesn't work
+#apt-get install mosquitto
+chmod +x /opt/thinkiq/etc/prereq/*.sh
+/opt/thinkiq/etc/prereq/dotnet-install.sh
+
+echo "Creating DataRoot and logs directories"
+cd /opt/thinkiq
+mkdir -p DataRoot
+mkdir -p logs/monitor
+mkdir -p logs/opcnorth
+mkdir -p logs/south
+mkdir -p logs/mqtt
+
+echo "Configuring the Monitor"
+cd services/Monitor || failed
+rm logsettings.json
+rm appsettings.json
+ln ../../etc/monitor/logsettings.json logsettings.json || failed
+ln ../../etc/monitor/appsettings.json appsettings.json || failed
+rm -rf Logs 2>/dev/null
+ln -s ../../logs/monitor Logs || failed
+
+echo "Configuring the North Bridge"
+cd ../OpcUaNorthService/ || failed
+rm logsettings.json
+rm appsettings.json
+ln ../../etc/opcnorth/logsettings.json logsettings.json
+ln ../../etc/opcnorth/appsettings.json appsettings.json
+rm -rf Logs 2>/dev/null
+ln -s ../../logs/opcnorth Logs
+
+echo "Configuring the MQTT Service"
+cd ../SmipMqttService/ || failed
+rm logsettings.json 2>/dev/null
+rm appsettings.json 2>/dev/null
+ln ../../etc/mqtt/logsettings.json logsettings.json
+ln ../../etc/mqtt/appsettings.json appsettings.json
+rm -rf Logs 2>/dev/null
+ln -s ../../logs/mqtt Logs
+
+echo "Configuring the South Service"
+cd ../SouthBridgeService/ || failed
+rm logsettings.json 2>/dev/null
+rm appsettings.json 2>/dev/null
+rm model.json 2>/dev/null
+ln ../../etc/south/logsettings.json logsettings.json
+ln ./appsettings.mqtt.json appsettings.json
+ln ../../etc/south/model.json model.json
+rm -rf Logs 2>/dev/nullSpr
+ln -s ../../logs/south Logs
+
+cd ../..
+
+if [ $(which systemctl) ]; then
+    echo "Creating symbolic links in /etc/systemd/system"
+    cd /etc/systemd/system
+    ln -s /opt/thinkiq/etc/systemd/tiq-monitor.service tiq-monitor.service
+    ln -s /opt/thinkiq/etc/systemd/tiq-opcua-north.service tiq-opcua-north.service
+    ln -s /opt/thinkiq/etc/systemd/tiq-south-bridge.service tiq-south-bridge.service
+    ln -s /opt/thinkiq/etc/systemd/smip-mqtt.service smip-mqtt.service
+
+    echo "Reloading systemd"
+    systemctl daemon-reload
+
+    systemctl enable tiq-monitor
+    systemctl enable tiq-opcua-north
+    systemctl enable tiq-south-bridge
+    systemctl enable smip-mqtt
+else
+    echo "systemd not found, services must be managed manually."
+fi
+
+echo "Starting the Configurator"
+cd /opt/thinkiq/services/Configurator
+/usr/bin/dotnet ThinkIQ.Configurator.ConsoleApp.dll /opt/thinkiq/services /opt/thinkiq/DataRoot
+if [ $? -eq 0 ]; then
+  if [ $(which systemctl) ]; then
+    echo "Starting services"
+    systemctl start tiq-opcua-north
+    systemctl start tiq-south-bridge
+    systemctl start tiq-monitor
+    systemctl start smip-mqtt
+  else
+    #TODO: Come up with a better way to control services on systemd-less environments
+    echo "Start services from: /opt/thinkiq/services"
+  fi
+fi
+
+exit 0

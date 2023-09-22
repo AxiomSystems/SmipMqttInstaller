@@ -1,0 +1,12 @@
+﻿{
+  "Parent": [
+    "thinkiq",
+    "quality_assurance_place",
+    "qa_gateway"
+  ],
+  "Name": "simulator",
+  "Attributes": {
+    "TagCount": 100,
+    "DataTimeGapSeconds": 1
+  }
+}

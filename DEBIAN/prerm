@@ -1,0 +1,50 @@
+#!/bin/sh
+
+yes_or_no()  {
+    while true; do
+        read -p "$* [y/n]: " yn
+        case $yn in
+            [Yy]*) return 0  ;;  
+            [Nn]*) echo "Aborted" ; return  1 ;;
+        esac
+    done
+}
+
+#TODO: This doesn't work
+#yes_or_no "Do you want to remove pre-req: mosquitto?" && apt-get remove mosquitto
+yes_or_no "Do you want to remove pre-req: dotnet?" && /opt/thinkiq/etc/prereq/dotnet-remove.sh
+
+systemctl stop smip-mqtt 2>/dev/null
+systemctl stop tiq-monitor 2>/dev/null
+systemctl stop tiq-opcua-north 2>/dev/null
+systemctl stop tiq-south-bridge 2>/dev/null
+
+echo "Waiting for services to stop..."
+sleep 3
+
+#Remove the Systemd links we created in postinst
+cd /etc/systemd/system || exit
+rm tiq-monitor.service
+rm tiq-opcua-north.service
+rm tiq-south-bridge.service
+rm smip-mqtt.service
+systemctl daemon-reload
+
+#We must remove all directories that were created by postinst since they are not deleted by pdkg
+cd /opt/thinkiq || exit
+rm -rf logs/monitor
+rm -rf logs/opcnorth
+rm -rf logs/south
+rm -rf logs/mqtt
+if [ "$(ls -A logs)" ]; then
+     echo "Not removing 'logs' directory since it's not empty"
+else
+    rm -r logs
+fi
+
+rm -rf DataRoot
+cd services || exit
+rm -rf Configurator CertificateGenerator Monitor OpcUaNorthService SmipMqttService SouthBridgeService 2>/dev/null
+rm -rf certificates/client 2>/dev/null
+
+exit 0

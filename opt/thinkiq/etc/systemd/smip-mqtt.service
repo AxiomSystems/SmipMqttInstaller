@@ -1,0 +1,17 @@
+[Unit]
+Description=SMIP MQTT Service
+After=network.target
+
+[Service]
+Type=simple
+#User=root
+#Group=root
+WorkingDirectory=/opt/thinkiq/services/SmipMqttService
+ExecStart=/usr/bin/dotnet SmipMqttService.dll
+Restart=on-failure
+RestartSec=30s
+# Give a reasonable amount of time for the server to start up/shut down
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+﻿{
+  "Parent": [
+    "ThinkIQ",
+    "Quality Assurance Place",
+    "QA Gateway"
+  ],
+  "Name": "Simulator",
+  "Attributes": {
+    "TagCount": 100,
+    "DataTimeGapSeconds": 10
+  }
+}
