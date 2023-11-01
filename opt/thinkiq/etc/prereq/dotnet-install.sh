@@ -5,6 +5,11 @@ set -- $lastUsers
 currUser=$1
 currHome="/home/$currUser"
 
+if [ $(which dotnet) ]; then
+   echo "dotnet appears to be already installed, please manually confirm you have the correct version."
+   return 0
+fi
+
 echo Getting .NET Package...
 cd $currHome
 if [ "$(arch)" == "armv7l" ]; then
